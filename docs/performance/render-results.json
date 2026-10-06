@@ -1,0 +1,30 @@
+[
+  {
+    "mode": "baseline",
+    "mounted": 10000,
+    "search": {
+      "cardRenders": 30000,
+      "commits": 3,
+      "duration": 5346.400009870529
+    },
+    "theme": {
+      "cardRenders": 0,
+      "commits": 0,
+      "duration": 0
+    }
+  },
+  {
+    "mode": "optimized",
+    "mounted": 7,
+    "search": {
+      "cardRenders": 0,
+      "commits": 5,
+      "duration": 9.700000047683716
+    },
+    "theme": {
+      "cardRenders": 0,
+      "commits": 0,
+      "duration": 0
+    }
+  }
+]

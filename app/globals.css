@@ -119,3 +119,14 @@ button, input { font: inherit; }
 @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; gap: 38px; } .create-panel { position: static; } .content-column { grid-row: 1; } aside { grid-row: 2; } }
 @media (max-width: 600px) { .topbar { height: 68px; padding: 0 18px; } .semester-chip { display: none; } .dashboard-grid { padding: 30px 18px 50px; } .welcome-row { align-items: flex-end; } .welcome-row h1 { font-size: 33px; } .welcome-row p:not(.date-label) { font-size: 14px; } .progress-orbit { width: 82px; height: 82px; border-width: 6px; } .progress-orbit strong { font-size: 20px; } .assignment-row { grid-template-columns: 27px minmax(0,1fr) 32px; gap: 10px; padding: 17px 14px; } .assignment-topline { align-items: flex-start; } .form-row { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+.list-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.list-toolbar input { padding: 10px; border: 1px solid var(--border); border-radius: 10px; }
+.assignment-row h3 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-theme="dark"] { color-scheme: dark; --background: #142624; --foreground: #e0eeeb; --card: #203b37; --border: #44615a; }
+[data-theme="dark"] .app-shell { background: var(--background); }
+[data-theme="dark"] :is(.topbar,.create-panel,.assignment-row,.progress-orbit) { background: var(--card); color: var(--foreground); border-color: var(--border); }
+[data-theme="dark"] :is(h1,h2,h3,.deadline-form label > span,.subject) { color: var(--foreground); }
+[data-theme="dark"] :is(input,.priority-select,.form-note) { background: #142624; color: var(--foreground); }
+
+[data-theme="dark"] .assignment-row[data-completed="true"] { background: #1c3430; }

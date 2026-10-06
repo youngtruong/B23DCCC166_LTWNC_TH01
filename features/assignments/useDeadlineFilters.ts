@@ -3,16 +3,8 @@
 import { useMemo, useState } from "react";
 import type { Assignment, DeadlineFilter } from "./types";
 
-const todayStart = () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
-};
-
-export function getDayDistance(dueDate: string): number {
-  const due = new Date(`${dueDate}T00:00:00`);
-  return Math.ceil((due.getTime() - todayStart().getTime()) / 86_400_000);
-}
+import { calcDaysLeft } from "./utils";
+export const getDayDistance = calcDaysLeft;
 
 export function useDeadlineFilters<T extends Assignment>(items: readonly T[]) {
   const [filter, setFilter] = useState<DeadlineFilter>("all");

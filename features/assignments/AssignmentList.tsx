@@ -1,0 +1,30 @@
+'use client';
+import { useCallback, useEffect, useMemo, memo } from 'react';
+import { FixedSizeList, type ListChildComponentProps } from 'react-window';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { fetchAssignments, toggleAssignment, deleteAssignment } from './assignmentsSlice';
+import { AssignmentCard } from './AssignmentCard';
+import { usePinStore } from './usePinStore';
+import { useDebounce } from './useDebounce';
+import { calcDaysLeft } from './utils';
+import type { Assignment, DeadlineFilter } from './types';
+type RowData = { items: Assignment[]; onToggle: (id: string) => void; onDelete: (id: string) => void };
+const Row = memo(function Row({ index, style, data }: ListChildComponentProps<RowData>) { return <div style={style}><AssignmentCard assignment={data.items[index]} onToggle={data.onToggle} onDelete={data.onDelete} /></div>; });
+export const AssignmentList = memo(function AssignmentList({ search = '', filter = 'all' }: { search?: string; filter?: DeadlineFilter }) {
+  const dispatch = useAppDispatch();
+  const { items, status, error } = useAppSelector(state => state.assignments);
+  const pinnedIds = usePinStore(state => state.pinnedIds);
+  const query = useDebounce(search);
+  useEffect(() => { if (status === 'idle') void dispatch(fetchAssignments()); }, [status, dispatch]);
+  const filtered = useMemo(() => { const pins = new Set(pinnedIds); const text = query.trim().toLocaleLowerCase('vi'); return items.filter(item => {
+    const days = calcDaysLeft(item.dueDate);
+    return (filter === 'all' || (filter === 'completed' && item.completed) || (filter === 'overdue' && !item.completed && days < 0) || (filter === 'pending' && !item.completed && days >= 0)) && `${item.title} ${item.subject}`.toLocaleLowerCase('vi').includes(text);
+  }).sort((a,b) => Number(pins.has(b.id)) - Number(pins.has(a.id)) || a.dueDate.localeCompare(b.dueDate)); }, [items, query, filter, pinnedIds]);
+  const onToggle = useCallback((id: string) => { dispatch(toggleAssignment(id)); }, [dispatch]);
+  const onDelete = useCallback((id: string) => { dispatch(deleteAssignment(id)); }, [dispatch]);
+  const data = useMemo(() => ({ items: filtered, onToggle, onDelete }), [filtered, onToggle, onDelete]);
+  if (status === 'idle' || status === 'loading') return <p role="status">Đang tải bài tập…</p>;
+  if (status === 'failed') return <div role="alert">{error}<button onClick={() => dispatch(fetchAssignments())}>Thử lại</button></div>;
+  if (!filtered.length) return <p>Không có bài tập ở mục này</p>;
+  return <div aria-label="Danh sách bài tập">{filtered.length > 100 ? <FixedSizeList height={600} width="100%" itemCount={filtered.length} itemSize={180} itemData={data} itemKey={(index, value) => value.items[index].id} overscanCount={3}>{Row}</FixedSizeList> : <div className="assignment-list">{filtered.map(assignment => <AssignmentCard key={assignment.id} assignment={assignment} onToggle={onToggle} onDelete={onDelete} />)}</div>}</div>;
+});

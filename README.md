@@ -115,3 +115,16 @@ Like the Sites package, `npm run build` runs `vinext build` directly; it does no
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+
+
+## Nâng cấp thực hành
+
+- Ghim bằng Zustand, chủ đề bằng ThemeContext độc lập.
+- Tìm kiếm debounce 300 ms, memo/callback và react-window cho danh sách lớn.
+- Thống kê được tách chunk bằng React.lazy/Suspense.
+- Redux logger chỉ hoạt động trong development; bỏ log thay thế 10.000 dòng để tránh tràn console.
+- `npm test`: Jest + ts-jest + RTL, coverage statements toàn thư mục features tối thiểu 70%.
+- `npm run measure:performance`: đo render trên `/benchmark?mode=baseline` và `/benchmark?mode=optimized` (cần dev server và Chrome trên macOS). Baseline là bản đối chứng không memo/debounce/virtualization, được dựng để so sánh cùng dữ liệu; không phải số liệu lịch sử của lần thực hành trước.
+- Dự án cần Node >=22.13.0. Runtime Node 22 được cài trong devDependencies để môi trường kiểm tra có thể chạy `node_modules/node/bin/node node_modules/vinext/dist/cli.js dev --port 5173`.
+
+Báo cáo và minh chứng: [docs/performance/REPORT.md](docs/performance/REPORT.md).

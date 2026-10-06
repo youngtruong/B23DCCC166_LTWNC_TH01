@@ -33,6 +33,9 @@ const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
+    replaceAssignments(state, action: PayloadAction<Assignment[]>) {
+      state.items = action.payload; state.status = "succeeded"; state.error = null;
+    },
     addAssignment: {
       reducer(state, action: PayloadAction<Assignment>) {
         state.items.unshift(action.payload);
@@ -60,15 +63,17 @@ const assignmentsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchAssignments.fulfilled, (state, action) => {
+        if (state.status !== "loading") return;
         state.status = "succeeded";
         state.items = action.payload;
       })
       .addCase(fetchAssignments.rejected, (state, action) => {
+        if (state.status !== "loading") return;
         state.status = "failed";
         state.error = action.payload ?? "Đã có lỗi xảy ra.";
       });
   },
 });
 
-export const { addAssignment, updateAssignment, toggleAssignment, deleteAssignment } = assignmentsSlice.actions;
+export const { addAssignment, updateAssignment, toggleAssignment, deleteAssignment, replaceAssignments } = assignmentsSlice.actions;
 export default assignmentsSlice.reducer;
