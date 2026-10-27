@@ -35,6 +35,25 @@ npm start
 
 Mật khẩu được lưu dạng scrypt có salt trong `data/users.json`. Không nhập khoá bí mật vào mã nguồn. Các tài khoản trên là tài khoản mẫu theo đề.
 
+## Cấu hình đăng nhập khi deploy Vercel
+
+File `.env.local` không được đẩy lên Git hay đóng gói ZIP. Vercel cần các biến môi trường riêng tại **Project → Settings → Environment Variables**, chọn môi trường **Production** (và **Preview** nếu muốn kiểm thử deployment xem trước).
+
+| Biến | Giá trị |
+| --- | --- |
+| `AUTH_SECRET` | Chuỗi bí mật sinh bằng `openssl rand -base64 32`; giữ cố định giữa các lần deploy. |
+| `AUTH_URL` | `https://b23-dccc-166-ltwnc-th-03.vercel.app` |
+| `NEXT_PUBLIC_SITE_URL` | `https://b23-dccc-166-ltwnc-th-03.vercel.app` |
+
+Sau khi lưu, vào **Deployments → Redeploy** để biến có hiệu lực trên bản mới. Không dùng URL localhost trong cấu hình Production. Auth.js tự nhận diện host Vercel, không cần thêm `trustHost: true` vào mã nguồn.
+
+Nếu `/api/auth/session` trả `There was a problem with the server configuration`, kiểm tra **Logs** của Vercel:
+
+- `[auth][error] MissingSecret`: chưa đặt `AUTH_SECRET` cho đúng môi trường hoặc chưa redeploy.
+- `[auth][error] UntrustedHost`: kiểm tra môi trường chạy và cấu hình proxy/host; đối chiếu [Auth.js Deployment](https://authjs.dev/getting-started/deployment).
+
+Thông báo JSON chung không xác định được riêng nguyên nhân nếu chưa có log. Không chia sẻ giá trị secret trong ảnh hay tin nhắn. Lỗi lưu deadline sau đăng nhập trên Vercel là vấn đề khác: mô hình file JSON cần filesystem có quyền ghi bền vững, như mô tả trong phần xác thực và phân quyền.
+
 ## Chiến lược render
 
 | Route | Chiến lược | Cách triển khai và lý do |
