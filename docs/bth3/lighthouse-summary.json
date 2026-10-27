@@ -1,0 +1,22 @@
+[
+  {
+    "path": "/",
+    "scores": {
+      "performance": 92,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "date": "2026-10-27T07:31:04.678Z"
+  },
+  {
+    "path": "/deadlines/1",
+    "scores": {
+      "performance": 95,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "date": "2026-10-27T07:31:10.828Z"
+  }
+]

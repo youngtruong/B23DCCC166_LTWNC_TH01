@@ -1,130 +1,156 @@
-# vinext-starter
+# Class Deadline Hub — Bài thực hành 3
 
-A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
+Cổng deadline lớp B23DCCC166, triển khai bằng Next.js 16 App Router, TypeScript và Auth.js v5. Khách xem công khai; sinh viên lưu tiến độ theo tài khoản; lớp trưởng thêm/xoá deadline. Dữ liệu mẫu có 4 môn học và 12 deadline trong `data/deadlines.json`.
 
-## Prerequisites
+## Cách chạy
 
-- Node.js `>=22.13.0`
-- Windows, macOS, or Linux; Git is required only for publishing, and Bash is not required for initialization or the project commands
-
-## Sites Lifecycle
-
-The bundled Sites initializer copies this starter into the project and runs its locked dependency install before returning the checkout. Edit the source under `app/`, use `npm run dev` for the Codex local preview, and run the project validation before hosting. The remote Sites builder also runs `npm run build` against the pushed commit. Do not rerun the dependency install unless dependencies are absent or the lockfile changed.
-
-This starter does not use `wrangler.jsonc`.
-
-`install:ci` runs `npm ci` once against this checkout's bundled lockfile, explicitly targeting the project and disabling parent-workspace discovery. It includes dev and optional dependencies required for builds and previews even when production/omit settings would exclude them. It defaults Sharp to prebuilt binaries unless the caller explicitly configures Sharp or a source build. It uses `--prefer-offline --no-audit --no-fund`, reuses the configured npm cache, and leaves network concurrency, retries, timeouts, and lifecycle-script policy to npm's configuration. Retain the installer session until it finishes; do not overlap installers for the same checkout.
-
-`scripts/sites-env.mjs` preserves the caller's HOME, npm cache, proxy, XDG, and temporary-directory configuration while defaulting Wrangler and Miniflare state to the checkout. If npm reports an unwritable cache, select a writable path with `npm_config_cache` for that install. The `dev` and `start` scripts also keep Wrangler logs inside the checkout. Generated `.sites-runtime/` and `.wrangler/` directories are disposable and ignored by Git.
-
-`npm run dev` uses `vinext dev` for the live Vite preview with HMR, starting at port 5173. Vinext records the running server in ignored `.vinext/` state and rejects another start for the same checkout while that process is alive; reuse its printed URL. It recovers stale state after a stopped process. Pass `--port <port>` or `--hostname <host>` after `npm run dev --` when needed; keep Codex previews on loopback. Like the Sites package, this relies on Vinext's advisory lock; exactly simultaneous starts can race.
-
-The bundled Sites Vite plugin simulates ChatGPT sign-in only for loopback development requests. Visit `/signin-with-chatgpt?return_to=/` to sign in as `local_seedy` (`seedy@sites.test`, display name `Seedy`) and `/signout-with-chatgpt?return_to=/` to sign out. The development cookie preserves that identity across server restarts. This does not exercise real ChatGPT OAuth and is not included in production builds; hosted authentication remains dispatch-owned.
-
-The Worker uses `vinext/server/fetch-handler`, including Vinext's config-aware image handling. After building, `npm start` runs that Worker locally through Wrangler on `127.0.0.1`, sharing `.wrangler/state` with dev preview and local D1 migrations; it does not deploy the site or simulate sign-in. Use the URL printed by the server. Pass `npm start -- --port <port>` to select a different built-preview port.
-
-Local previews use Miniflare's placeholder `Request.cf` metadata without a network lookup. Set `CLOUDFLARE_CF_FETCH_ENABLED=true` to opt into fetching preview metadata; this setting does not change hosted request metadata.
-
-Local tool usage metrics are disabled by default. Set `WRANGLER_SEND_METRICS=true` to opt in.
-
-## Included Shape
-
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `@cloudflare/workers-types` provides Worker types; `cloudflare-env.d.ts` declares optional `DB`/`BUCKET` bindings—update these declarations if binding names change
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
-
-The user ID is stable for the same user on the same Site and different across Sites. Use it as the durable user key; use email and name for display or contact purposes.
-
-SIWC-authenticated workspace sites may also receive `oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty `name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by `oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
-```
-
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use the returned `userId` as the stable user key for user-owned records; do not use email as a durable identifier.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send anonymous visitors through Sign in with ChatGPT.
-- In a Server Component, start sign-in with `<a href={chatGPTSignInPath(returnTo)} target="_top">`. The auth helper module is server-only; do not import it into a Client Component.
-- Do not use `fetch`, XHR, a client-side router, or a framework link that can prefetch the sign-in route. SIWC must start as a top-level navigation.
-- Never request the AuthAPI authorization endpoint directly. The dispatch-owned `/signin-with-chatgpt` route must start the SIWC flow.
-- Use `chatGPTSignOutPath(returnTo)` for browser sign-out links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the OAuth cookies, and identity header injection. Do not implement app routes for those reserved paths. Routes that do not import and call the helper remain anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the Sites hosting platform's access policy controls for workspace-wide restrictions, or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Local D1 migrations
-
-For a D1-backed local preview, generate SQL with `npm run db:generate`. Build once through the Sites skill's build entrypoint (or `npm run build` for standalone use) to generate `dist/server/wrangler.json`, rebuilding if bindings change. From the project root, apply each pending migration in order:
+Cần Node.js >= 22.13 và npm. Tại thư mục dự án:
 
 ```sh
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_example.sql
+npm ci
+cp .env.example .env.local
+openssl rand -base64 32
 ```
 
-Replace the filename with the pending migration and `DB` with your D1 binding name if different. Use `.wrangler/state`, not `.wrangler/state/v3`; Wrangler adds the versioned directories. Do not replay migrations already applied locally. This updates only the preview database; publishing applies production migrations separately.
+Điền chuỗi vừa tạo vào `AUTH_SECRET` trong `.env.local`. Đặt `AUTH_URL` và `NEXT_PUBLIC_SITE_URL` là `http://localhost:3000` khi chạy local, hoặc URL website thực tế khi triển khai. Không commit `.env.local`.
 
-## Diagnostic Commands
+```sh
+npm run dev
+# http://localhost:3000
+```
 
-- `npm run install:ci`: perform the one locked dependency install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build the deployable Sites artifact
-- `npm run start`: preview the built Worker locally with D1/R2 support
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+Kiểm tra production:
 
-When using the Sites plugin, follow its skill instructions for installation, builds, and publishing. These npm commands remain available for standalone use.
+```sh
+npm run build
+npm start
+```
 
-Like the Sites package, `npm run build` runs `vinext build` directly; it does not require a host `timeout` command.
+`next/font` tải Be Vietnam Pro lúc build, cần kết nối Google Fonts. Font được Next.js tự host sau khi build, trình duyệt không gọi Google Fonts. Các script chính đã chuyển từ Vinext sang Next.js để thực hiện đúng SSG/ISR/SSR. Mã bài Redux cũ còn ở `features/`, `components/deadlines/`, `/benchmark` và API giả lập `/api/assignments`; không dùng cho dữ liệu Hub.
 
-## Learn More
+| Tài khoản | Mật khẩu thực hành | Vai trò |
+| --- | --- | --- |
+| admin@ptit.edu.vn | admin123 | admin |
+| sv@ptit.edu.vn | sv123456 | user |
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+Mật khẩu được lưu dạng scrypt có salt trong `data/users.json`. Không nhập khoá bí mật vào mã nguồn. Các tài khoản trên là tài khoản mẫu theo đề.
+
+## Chiến lược render
+
+| Route | Chiến lược | Cách triển khai và lý do |
+| --- | --- | --- |
+| `/` | SSG | `dynamic = 'force-static'`; giới thiệu lớp, thống kê và trích lịch môn học được chụp tại thời điểm build; tạo sẵn HTML cho trang tổng quan. |
+| `/subjects/[slug]` | SSG | `generateStaticParams()` tạo 4 môn học; `dynamicParams = false`; thông tin và danh sách ban đầu là ảnh chụp tại thời điểm build. Xem `/deadlines` để có dữ liệu mới nhất. |
+| `/deadlines` | ISR 60 giây | `revalidate = 60`; HTML công khai có nội dung, tái tạo ở nền sau khi hết hạn và có request. Admin thao tác còn chủ động vô hiệu cache. |
+| `/deadlines/[id]` | ISR theo yêu cầu | Sinh trước 12 trang bằng `generateStaticParams`, `revalidate = false`, `dynamicParams = true`. Server Action gọi `revalidatePath` sau thêm/xoá; ID mới được tạo khi truy cập, ID đã xoá trả 404. |
+| `/dashboard` | SSR | `dynamic = 'force-dynamic'`; đọc phiên và tiến độ đúng userId ở mỗi request. |
+| `/admin` | SSR | `dynamic = 'force-dynamic'`; kiểm tra quyền server rồi mới đọc danh sách quản trị. |
+
+Trang chủ và chi tiết là Server Component, HTML chứa sẵn nội dung. Chỉ các phần điều hướng theo URL, thông tin phiên ở header, bộ lọc, đếm ngược và form đăng nhập là Client Component. Form quản trị/tiến độ dùng HTML phía server. Header đọc phiên qua API Auth.js phía client để các trang công khai không bị chuyển thành SSR vì đọc cookies trong layout.
+
+Ảnh kết quả `npm run build` (trình bày lại nguyên văn log build):
+
+![Kết quả build production](docs/bth3/build.png)
+
+Log gốc: [build.log](docs/bth3/build.log). Ký hiệu `○` là static, `●` là static với generateStaticParams, `ƒ` là dynamic. Chi tiết mang ký hiệu `●` vì prerender lúc build; ISR theo yêu cầu được thực hiện bằng Server Actions, không có chu kỳ thời gian.
+
+## Routing và giao diện
+
+- `(public)` có header và footer; `(app)` có layout riêng cho không gian đăng nhập và metadata noindex.
+- `/dashboard/layout.tsx` thêm sidebar lồng nhau. `usePathname()` tô sáng menu hiện tại.
+- `(app)/loading.tsx` hiển thị trạng thái tải. Không đặt loading boundary ở root để ID không tồn tại trả HTTP 404 trước khi streaming HTML.
+- `app/error.tsx` có nút “Thử lại”; `app/not-found.tsx` là trang 404 chung.
+- `/403` giải thích thiếu quyền. `/login` giữ callbackUrl nội bộ, ngăn chuyển hướng sang website bên ngoài.
+
+## Xác thực và phân quyền
+
+Auth.js Credentials dùng JWT trong cookie HttpOnly; callbacks bổ sung id/role vào JWT và session. Kiểu `Role` là union `'guest' | 'user' | 'admin'`, không dùng role kiểu string chung. Khai báo mở rộng Session/User và JWT tại `types/next-auth.d.ts` (JWT v5 được định nghĩa tại `@auth/core/jwt`).
+
+Ma trận duy nhất tại `lib/permissions.ts`:
+
+| Hành động | guest | user | admin |
+| --- | --- | --- | --- |
+| Xem deadline | ✓ | ✓ | ✓ |
+| Đánh dấu đã xong | ✗ | ✓ | ✓ |
+| Thêm deadline | ✗ | ✗ | ✓ |
+| Xoá deadline | ✗ | ✗ | ✓ |
+
+Ba lớp bảo vệ:
+
+1. `proxy.ts` bảo vệ `/dashboard/:path*`, `/admin/:path*`, giữ callbackUrl, user vào admin chuyển `/403`. Next.js 16 đổi tên Middleware thành Proxy; không tạo cả `middleware.ts` và `proxy.ts` cùng lúc.
+2. Mỗi trang riêng tư tự gọi `requirePermission()` trước khi đọc dữ liệu.
+3. Route Handler POST `/api/deadlines` kiểm tra Origin và gọi các Server Action qua phía server, rồi trả chuyển hướng 303 để trình duyệt nhận HTML mới. Cách submit này tránh lỗi React Flight transition treo pending khi revalidate ở production ([báo cáo trên Next.js](https://github.com/vercel/next.js/issues/97990)). Mỗi Server Action gọi lại `requirePermission()`, xác thực dữ liệu với Zod và chỉ lấy userId từ phiên. Tiến độ được lưu theo userId, không nhận userId do client gửi.
+
+Các thao tác ghi được tuần tự hoá trong một Node process và dùng file tạm + rename nguyên tử để tránh ghi JSON dở dang. ID tăng đơn điệu, không tái sử dụng ID đã xoá. Xoá deadline cũng xoá tham chiếu trong tiến độ. Mô hình file JSON phù hợp chạy một Node server với ổ đĩa có quyền ghi; chưa hỗ trợ nhiều process ghi đồng thời. Vercel không có ổ đĩa ứng dụng ghi bền vững: cần đổi sang database/object storage trước khi triển khai thực tế. Bài này chưa triển khai Vercel hay GitHub OAuth; có Jest cho `can()` là mục điểm cộng.
+
+## SEO và tối ưu
+
+- Metadata động ở trang chi tiết: title, description, canonical, Open Graph và Twitter.
+- `/deadlines/[id]/share` tạo PNG 1200×630 riêng theo tên bài, môn học và hạn nộp bằng `ImageResponse`. Metadata trỏ trực tiếp route này.
+- `/sitemap.xml` gồm trang chủ, danh sách, 4 môn học và mọi deadline hiện tại; được vô hiệu cache khi thêm/xoá.
+- `/robots.txt` chặn dashboard/admin/login/API/benchmark. Login và layout riêng tư còn đặt noindex.
+- JSON-LD `BreadcrumbList` được render trong HTML chi tiết, escape `<` khi nhúng JSON.
+- `next/font` Be Vietnam Pro hỗ trợ tiếng Việt; `next/image` có kích thước cố định cho logo và ảnh lịch trang chủ.
+
+Ảnh trang chủ và trang chi tiết:
+
+![Trang chủ](docs/bth3/home.png)
+![Chi tiết deadline](docs/bth3/detail.png)
+
+Ảnh view-source `/deadlines/1` và HTML gốc:
+
+![View source deadline 1](docs/bth3/view-source.png)
+
+[HTML phản hồi từ server](docs/bth3/deadline-1-source.html). Có thể tự kiểm tra bằng `view-source:http://localhost:3000/deadlines/1`, tìm title, `og:image`, `BreadcrumbList` và tên bài tập.
+
+## Lighthouse production
+
+| Route | Performance | Accessibility | Best Practices | SEO |
+| --- | --- | --- | --- | --- |
+| `/` | 92 | 100 | 100 | 100 |
+| `/deadlines/1` | 95 | 100 | 100 | 100 |
 
 
-## Nâng cấp thực hành
+Đo bằng Lighthouse mobile, mô phỏng mạng/CPU mặc định trên Chrome headless ở localhost sau `npm run build` và `npm start`. Điểm có thể thay đổi theo máy và lần chạy; không phải số liệu Core Web Vitals từ người dùng thực tế.
 
-- Ghim bằng Zustand, chủ đề bằng ThemeContext độc lập.
-- Tìm kiếm debounce 300 ms, memo/callback và react-window cho danh sách lớn.
-- Thống kê được tách chunk bằng React.lazy/Suspense.
-- Redux logger chỉ hoạt động trong development; bỏ log thay thế 10.000 dòng để tránh tràn console.
-- `npm test`: Jest + ts-jest + RTL, coverage statements toàn thư mục features tối thiểu 70%.
-- `npm run measure:performance`: đo render trên `/benchmark?mode=baseline` và `/benchmark?mode=optimized` (cần dev server và Chrome trên macOS). Baseline là bản đối chứng không memo/debounce/virtualization, được dựng để so sánh cùng dữ liệu; không phải số liệu lịch sử của lần thực hành trước.
-- Dự án cần Node >=22.13.0. Runtime Node 22 được cài trong devDependencies để môi trường kiểm tra có thể chạy `node_modules/node/bin/node node_modules/vinext/dist/cli.js dev --port 5173`.
+Báo cáo đầy đủ: [Trang chủ](docs/bth3/lighthouse-home.html), [Chi tiết](docs/bth3/lighthouse-detail.html). JSON và thời điểm đo nằm trong `docs/bth3/lighthouse-summary.json`.
 
-Báo cáo và minh chứng: [docs/performance/REPORT.md](docs/performance/REPORT.md).
+## Kiểm thử
+
+```sh
+npm run lint
+npm test
+npm run build
+npm start
+# Ở terminal khác, cần Google Chrome cài trên macOS:
+node scripts/verify-bth3.mjs
+node scripts/lighthouse-bth3.mjs
+```
+
+Jest: 28 test đạt, bao gồm 4 test duyệt đủ 12 ô trong ma trận `can()` và bộ kiểm thử bài trước. Script Playwright kiểm tra HTML/SEO/ảnh chia sẻ, callback đăng nhập, 404, sai mật khẩu, user bị chặn admin, lưu/hoàn tác tiến độ, admin thêm/xoá và vô hiệu cache chi tiết, sitemap, bộ lọc và giao diện mobile. Script có ghi dữ liệu tạm qua giao diện, rồi xoá deadline kiểm thử và hoàn tác tiến độ; chạy trên bộ dữ liệu thực hành.
+
+## Trả lời câu hỏi
+
+**(1) Vì sao `/deadlines/[id]` dùng ISR?**
+
+Nội dung công khai cần HTML có sẵn để SEO, chia sẻ link và tải nhanh. Deadline thay đổi khi admin thêm/xoá, nên SSG thuần sẽ buộc build lại mới cập nhật; SSR cho mọi lượt xem sẽ tốn xử lý không cần thiết. ISR giữ lợi ích trang tĩnh, còn `revalidatePath('/deadlines/' + id)` vô hiệu cache sau khi ghi thành công. Request tiếp theo tạo nội dung mới hoặc 404 mà không phải build lại toàn bộ website. `dynamicParams = true` cho phép sinh trang cho ID mới chưa có lúc build.
+
+**(2) Nếu chỉ dùng Middleware để bảo vệ `/admin` thì có rủi ro gì?**
+
+Matcher có thể cấu hình thiếu, lớp chặn có thể có lỗ hổng hoặc người dùng gọi trực tiếp Server Action mà không mở trang admin. Ẩn nút trên giao diện cũng không ngăn được request tự tạo. Vì vậy trang admin phải kiểm tra phiên/quyền trước khi đọc dữ liệu; từng action phải kiểm tra lại quyền, validate đầu vào và chỉ sử dụng userId từ phiên ở phía server. Proxy là lớp chặn sớm, không thay thế kiểm tra tại nơi đọc/ghi dữ liệu.
+
+## Tài liệu tham khảo
+
+- [Next.js ISR](https://nextjs.org/docs/app/guides/incremental-static-regeneration)
+- [Next.js Proxy](https://nextjs.org/docs/app/getting-started/proxy)
+- [Auth.js Credentials](https://authjs.dev/getting-started/providers/credentials)
+- Đề: LTWNC BTTH 3 Xây dựng Class Deadline Hub; slide Buổi 7 và Buổi 8 do người học cung cấp.
+
+Khi nộp mã nguồn, bỏ `node_modules`, `.next`, `.env.local`, `coverage` và `.git`; giữ `package-lock.json`, `.env.example`, `data`, `README.md` và `docs/bth3`.
+
+
+## Giao diện tham khảo PTIT S-Link
+
+Giao diện dùng đỏ–trắng, nền xám nhẹ, sidebar điều hướng và các vùng thông tin theo phong cách cổng sinh viên. Banner có minh hoạ học thuật riêng, trang tổng quan hiển thị môn học/deadline từ dữ liệu thật tại thời điểm build. Header, danh sách deadline, đăng nhập, dashboard và form quản trị cùng một hệ màu và typography. Dashboard hiển thị phần trăm hoàn thành thật của tài khoản.
+
+Màn hình mobile có menu rút gọn, danh sách một cột và trường nhập hỗ trợ bàn phím; không thay đổi xác thực/phân quyền hoặc chiến lược render. Các quyết định thiết kế ở [design.md](design.md). Ảnh kiểm tra desktop/tablet/mobile tại [docs/ui](docs/ui). Giao diện tham khảo [PTIT S-Link](https://slink.ptit.edu.vn/), dùng tên và biểu tượng ClassHub riêng.

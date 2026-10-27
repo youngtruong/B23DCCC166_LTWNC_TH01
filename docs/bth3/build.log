@@ -1,0 +1,53 @@
+
+> class-deadline-hub@0.1.0 build
+> node node_modules/next/dist/bin/next build --webpack
+
+▲ Next.js 16.2.6 (webpack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.5s
+  Running TypeScript ...
+  Finished TypeScript in 3.6s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/27) ...
+  Generating static pages using 7 workers (6/27) 
+  Generating static pages using 7 workers (13/27) 
+  Generating static pages using 7 workers (20/27) 
+✓ Generating static pages using 7 workers (27/27) in 215ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)                           Revalidate  Expire
+┌ ○ /
+├ ○ /_not-found
+├ ○ /403
+├ ƒ /admin
+├ ƒ /api/assignments
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/deadlines
+├ ○ /benchmark
+├ ƒ /dashboard
+├ ○ /deadlines                                1m      1y
+├ ● /deadlines/[id]
+│ ├ /deadlines/1
+│ ├ /deadlines/2
+│ ├ /deadlines/3
+│ └ [+9 more paths]
+├ ƒ /deadlines/[id]/share
+├ ƒ /login
+├ ○ /robots.txt
+├ ○ /sitemap.xml                              1m      1y
+└ ● /subjects/[slug]
+  ├ /subjects/lap-trinh-web-nang-cao
+  ├ /subjects/co-so-du-lieu
+  ├ /subjects/an-toan-mang
+  └ /subjects/tri-tue-nhan-tao
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

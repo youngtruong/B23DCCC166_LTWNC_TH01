@@ -1,0 +1,12 @@
+[
+  "home-desktop: no horizontal page overflow",
+  "home-tablet: no horizontal page overflow",
+  "home-mobile: no horizontal page overflow",
+  "deadlines-desktop: no horizontal page overflow",
+  "deadlines-mobile: no horizontal page overflow",
+  "login-desktop: no horizontal page overflow",
+  "login-mobile: no horizontal page overflow",
+  "detail-desktop: no horizontal page overflow",
+  "detail-mobile: no horizontal page overflow",
+  "Sidebar navigation: passed"
+]

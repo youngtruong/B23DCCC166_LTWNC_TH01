@@ -1,0 +1,11 @@
+{
+  "results": [
+    "Public home, 4 subjects, SSR HTML, metadata, JSON-LD",
+    "Guest redirects with callback; missing deadline is 404",
+    "Wrong password rejected",
+    "Student login, completion persistence, denied admin",
+    "Admin creates detail, updates sitemap, deletes and invalidates cached detail",
+    "Public filter and responsive layout"
+  ],
+  "browserErrors": []
+}

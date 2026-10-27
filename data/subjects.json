@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "lap-trinh-web-nang-cao",
+    "name": "Lập trình Web nâng cao",
+    "code": "INT3306",
+    "description": "Next.js, xác thực và ứng dụng web hiện đại."
+  },
+  {
+    "slug": "co-so-du-lieu",
+    "name": "Cơ sở dữ liệu",
+    "code": "INT2207",
+    "description": "Thiết kế dữ liệu, truy vấn SQL và tối ưu hệ thống."
+  },
+  {
+    "slug": "an-toan-mang",
+    "name": "An toàn mạng",
+    "code": "INT3305",
+    "description": "Bảo vệ hệ thống và phân tích các nguy cơ bảo mật."
+  },
+  {
+    "slug": "tri-tue-nhan-tao",
+    "name": "Trí tuệ nhân tạo",
+    "code": "INT3401",
+    "description": "Thuật toán tìm kiếm, học máy và ứng dụng thực tế."
+  }
+]

@@ -43,3 +43,6 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+
+!.env.example
+/data/*.tmp

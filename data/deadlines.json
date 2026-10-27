@@ -1,0 +1,115 @@
+{
+  "nextId": 18,
+  "deadlines": [
+    {
+      "id": "1",
+      "subjectSlug": "lap-trinh-web-nang-cao",
+      "title": "Xây dựng Class Deadline Hub",
+      "description": "Hoàn thành xây dựng class deadline hub. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-01T16:59:00.000Z",
+      "priority": "high"
+    },
+    {
+      "id": "2",
+      "subjectSlug": "lap-trinh-web-nang-cao",
+      "title": "Tích hợp xác thực và phân quyền",
+      "description": "Hoàn thành tích hợp xác thực và phân quyền. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-03T16:59:00.000Z",
+      "priority": "medium"
+    },
+    {
+      "id": "3",
+      "subjectSlug": "lap-trinh-web-nang-cao",
+      "title": "Báo cáo đồ án Next.js",
+      "description": "Hoàn thành báo cáo đồ án next.js. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-05T16:59:00.000Z",
+      "priority": "low"
+    },
+    {
+      "id": "4",
+      "subjectSlug": "co-so-du-lieu",
+      "title": "Thiết kế ERD hệ thống thư viện",
+      "description": "Hoàn thành thiết kế erd hệ thống thư viện. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-07T16:59:00.000Z",
+      "priority": "high"
+    },
+    {
+      "id": "5",
+      "subjectSlug": "co-so-du-lieu",
+      "title": "Thực hành truy vấn SQL",
+      "description": "Hoàn thành thực hành truy vấn sql. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-09T16:59:00.000Z",
+      "priority": "medium"
+    },
+    {
+      "id": "6",
+      "subjectSlug": "co-so-du-lieu",
+      "title": "Tối ưu chỉ mục cơ sở dữ liệu",
+      "description": "Hoàn thành tối ưu chỉ mục cơ sở dữ liệu. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-11T16:59:00.000Z",
+      "priority": "low"
+    },
+    {
+      "id": "7",
+      "subjectSlug": "an-toan-mang",
+      "title": "Phân tích mô hình Zero Trust",
+      "description": "Hoàn thành phân tích mô hình zero trust. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-13T16:59:00.000Z",
+      "priority": "high"
+    },
+    {
+      "id": "8",
+      "subjectSlug": "an-toan-mang",
+      "title": "Thực hành kiểm tra bảo mật",
+      "description": "Hoàn thành thực hành kiểm tra bảo mật. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-15T16:59:00.000Z",
+      "priority": "medium"
+    },
+    {
+      "id": "9",
+      "subjectSlug": "an-toan-mang",
+      "title": "Báo cáo an toàn ứng dụng",
+      "description": "Hoàn thành báo cáo an toàn ứng dụng. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-17T16:59:00.000Z",
+      "priority": "low"
+    },
+    {
+      "id": "10",
+      "subjectSlug": "tri-tue-nhan-tao",
+      "title": "Cài đặt thuật toán A*",
+      "description": "Hoàn thành cài đặt thuật toán a*. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-19T16:59:00.000Z",
+      "priority": "high"
+    },
+    {
+      "id": "11",
+      "subjectSlug": "tri-tue-nhan-tao",
+      "title": "Huấn luyện mô hình phân loại",
+      "description": "Hoàn thành huấn luyện mô hình phân loại. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-21T16:59:00.000Z",
+      "priority": "medium"
+    },
+    {
+      "id": "12",
+      "subjectSlug": "tri-tue-nhan-tao",
+      "title": "Báo cáo bài tập lớn AI",
+      "description": "Hoàn thành báo cáo bài tập lớn ai. Nộp mã nguồn và báo cáo giải thích cách thực hiện, kèm kết quả kiểm thử qua hệ thống lớp.",
+      "dueDate": "2026-11-23T16:59:00.000Z",
+      "priority": "low"
+    }
+  ],
+  "completions": {
+    "1": [
+      "1",
+      "2"
+    ],
+    "2": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "8"
+    ]
+  }
+}
